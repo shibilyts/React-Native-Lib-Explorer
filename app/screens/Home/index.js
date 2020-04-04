@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Text,StatusBar,Image,FlatList,TouchableOpacity,TextInput,BackHandler,ToastAndroid,Button } from 'react-native';
+import { View, Text,StatusBar,Image,ScrollView,TouchableOpacity,TextInput,BackHandler,ToastAndroid,Button } from 'react-native';
 import styles from './styles';
 import Appstyles from '../../config/styles'
 import images from '../../config/images'
@@ -12,9 +12,6 @@ import { addFavToReducer,
   deleteFavToReducer }from '../../actions/homeActions.js';
   import {
     AdMobBanner,
-    AdMobInterstitial,
-    PublisherBanner,
-    AdMobRewarded,
   } from 'react-native-admob'
  class Home extends Component {
   constructor(props){
@@ -23,7 +20,8 @@ import { addFavToReducer,
       toggle:false,
       showLottie:true,
       rotate:0,
-      backPressed: 0
+      backPressed: 0,
+      currentlyOpenSwipeable:null
     }
   }
   
@@ -85,7 +83,19 @@ setTimeout(()=> {
     this.props.navigation.navigate('DetailsPage',{link:item.link})
   }
  
-  renderItem=({item,index})=>{
+  onOpen =(event, gestureState, swipeable) => {
+    const {currentlyOpenSwipeable} = this.state;
+    if (currentlyOpenSwipeable && currentlyOpenSwipeable !== swipeable) {
+      currentlyOpenSwipeable.recenter();
+    }
+
+    this.setState({currentlyOpenSwipeable: swipeable});
+  };
+  onClose=() => {
+    this.setState({currentlyOpenSwipeable: null})
+}
+
+  renderItem=(item,index)=>{
     const { darkMode } = this.props;
     const reducerState= this.props.fav
     const isPresent=reducerState.findIndex(item=>item===index);
@@ -100,7 +110,8 @@ setTimeout(()=> {
         </View>
         </TouchableOpacity>,
       <TouchableOpacity style={{backgroundColor:darkMode?'#354145':'#2988ae',justifyContent:'center',width:'50%',minHeight:'100%'}}
-      onPress={()=>this.onLikePress(index)}
+      onPress={()=>{this.onLikePress(index);
+      this.onOpen();}}
         activeOpacity={0.8}>
         <View style={{alignItems:'center',width:'50%'}}>{
           isPresent>-1?<Image source={images.icons.heartSelected} style={{width:25,height:25,resizeMode:'contain',tintColor:Appstyles.color.COLOR_WHITE}}/>:
@@ -112,18 +123,21 @@ setTimeout(()=> {
       </TouchableOpacity>
     ];
     return(
-     <View>
-    {index!==data.length-1&&data[index].type!==data[index+1].type&&data[index].type||index==0&&
+     <View key={index.toString()}>
+    {item.category&&item.category!=='same'?
       <View  style={{borderBottomWidth:0.5,width:'100%',
       borderBottomColor:darkMode?"#49595f":'#d2d2d0',
       height:30,backgroundColor:darkMode?'#354145':"#adaca9",
       justifyContent:'center',paddingVertical:10}}
       
       >
-      <Text style={{color:darkMode?Appstyles.color.COLOR_WHITE:Appstyles.color.COLOR_SECONDARY,fontSize:18,fontWeight:'bold',marginLeft:10}}>{item.type}</Text>
-      </View>}
+      <Text style={{color:darkMode?Appstyles.color.COLOR_WHITE:Appstyles.color.COLOR_SECONDARY,fontSize:18,fontWeight:'bold',marginLeft:10}}>{item.category}</Text>
+      </View>:<View/>}
       {index%10===0&&index!==0&&
-      <View style={{width:'100%',padding:10}}>
+      <View style={{width:'100%',padding:10,justifyContent:'center',alignItems:'center', 
+       borderBottomColor:darkMode?"#49595f":'#d2d2d0',
+       borderBottomWidth:0.5,
+       }}>
         <AdMobBanner
   adSize="banner"
   adUnitID="ca-app-pub-1587586515943690/2710599997"
@@ -137,7 +151,8 @@ setTimeout(()=> {
     
          <Swipeable rightButtons={rightButtons} style={{borderBottomWidth:0.5,borderColor:darkMode?'#49595f':'#d2d2d0',
          width:'100%',minHeight:70,backgroundColor:darkMode?Appstyles.color.COLOR_BLACK:'#e4e3e2'}}
-         
+         onRightButtonsOpenRelease={this.onOpen}
+          onRightButtonsCloseRelease={this.onClose}
          >
          
              <TouchableOpacity style={{width:'100%',minHeight:70}}onPress={()=>this.navToWebView(item)}
@@ -192,13 +207,13 @@ render(){
         {/* <View style={{height:50,width:'100%'}}>
           <TextInput style={{flex:1,padding:10}}/>
           </View> */}
-        <FlatList
-      renderItem={this.renderItem}
-      data={data}
-      extraData={this.state}
-      contentContainerStyle={{paddingBottom:20}}
-      keyExtractor={(item, index) => index.toString()}
-      />
+          <ScrollView>
+          {
+            data.map((item,index)=>{
+              return this.renderItem(item,index)
+            })
+          }
+          </ScrollView>
     </View>
   );
 }

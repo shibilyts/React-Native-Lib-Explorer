@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Text,StatusBar,Image,FlatList,TouchableOpacity,TextInput,BackHandler } from 'react-native';
+import { View, Text,StatusBar,Image,ScrollView,TouchableOpacity,TextInput,BackHandler } from 'react-native';
 import styles from './styles';
 import Appstyles from '../../config/styles'
 import images from '../../config/images'
@@ -12,13 +12,17 @@ import LottieView from 'lottie-react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { addFavToReducer,
   deleteFavToReducer }from '../../actions/homeActions.js';
+  import {
+    AdMobBanner,
+  } from 'react-native-admob'
  class Liked extends Component {
   constructor(props){
     super(props);
     this.state={
       toggle:false,
       showLottie:true,
-      rotate:0
+      rotate:0,
+      currentlyOpenSwipeable:null
     }
   }
   componentDidMount(){
@@ -73,7 +77,19 @@ setTimeout(()=> {
   navToWebView=(item)=>{
     this.props.navigation.navigate('DetailsPage',{link:item.link})
   }
-  renderItem=({item,index})=>{
+  onOpen =(event, gestureState, swipeable) => {
+    const {currentlyOpenSwipeable} = this.state;
+    if (currentlyOpenSwipeable && currentlyOpenSwipeable !== swipeable) {
+      currentlyOpenSwipeable.recenter();
+    }
+
+    this.setState({currentlyOpenSwipeable: swipeable});
+  };
+  onClose=() => {
+    this.setState({currentlyOpenSwipeable: null})
+}
+
+  renderItem=(item,index)=>{
     const {darkMode} = this.props;
     const reducerState= this.props.fav
     const isPresent=reducerState.findIndex(Item=>Item===item.newIndex);
@@ -101,7 +117,7 @@ setTimeout(()=> {
       </TouchableOpacity>
     ];
     return(
-     <View>
+     <View key={index.toString()}>
     {index==0&&
       <View  style={{borderBottomWidth:0.5,width:'100%',
       borderColor:darkMode?"#49595f":'#d2d2d0',
@@ -114,7 +130,8 @@ setTimeout(()=> {
     
          <Swipeable rightButtons={rightButtons} style={{borderBottomWidth:0.5,borderColor:darkMode?'#49595f':'#d2d2d0',
          width:'100%',minHeight:70,backgroundColor:darkMode?Appstyles.color.COLOR_BLACK:'#e4e3e2'}}
-         
+          onRightButtonsOpenRelease={this.onOpen}
+          onRightButtonsCloseRelease={this.onClose}
          >
          
              <TouchableOpacity style={{width:'100%',minHeight:70}}onPress={()=>this.navToWebView(item)}
@@ -150,7 +167,7 @@ render(){
       <View style={darkMode?styles.headerViewDark:styles.headerView}>{
         this.state.showLottie?<LottieView source={darkMode?require('../../assets/lottieJson/logoSplash.json')
         :require('../../assets/lottieJson/headerLottie.json')} autoPlay loop 
-      style={{width:50,height:50,resizeMode:'contain'}}/>:
+      style={{width:50,height:50,}}/>:
       <Image source ={images.icons.logoWhite}style={{width:33,height:33,resizeMode:'contain',
       tintColor:darkMode?Appstyles.color.COLOR_PRIMARY:Appstyles.color.COLOR_WHITE}} />
         }
@@ -165,7 +182,18 @@ render(){
         {/* <View style={{height:50,width:'100%'}}>
           <TextInput style={{flex:1,padding:10}}/>
           </View> */}
-        <FlatList
+          <ScrollView
+          contentContainerStyle={{paddingBottom:20}}
+          >
+          {newDate.map((Item,index)=>{
+            return this.renderItem(Item,index)
+          })}
+          {newDate.length===0&&
+            <View style={{width:metrics.screenWidth,height:metrics.screenHeight*.8,justifyContent:'center',alignItems:'center'}}>
+            <Text style={{color:darkMode?Appstyles.color.COLOR_WHITE:Appstyles.color.COLOR_SECONDARY,fontWeight:'bold'}}>You don't have any favorite item</Text>
+            </View>}
+          </ScrollView>
+        {/* <FlatList
       renderItem={this.renderItem}
       data={newDate}
       extraData={this.state}
@@ -173,12 +201,20 @@ render(){
       contentContainerStyle={{paddingBottom:20}}
       ListEmptyComponent={()=>{
         return(
-          <View style={{width:metrics.screenWidth,height:metrics.screenHeight*.8,justifyContent:'center',alignItems:'center'}}>
-            <Text style={{color:darkMode?Appstyles.color.COLOR_WHITE:Appstyles.color.COLOR_SECONDARY,fontWeight:'bold'}}>You don't have any favorite item</Text>
-            </View>
+         
         )
       }}
-      />
+      /> */}
+      <View style={{width:'100%',
+      justifyContent:'center',alignItems:'center'}}>
+        <AdMobBanner
+  adSize="banner"
+  adUnitID="ca-app-pub-1587586515943690/2710599997"
+  onAdFailedToLoad={error => {
+  //console.log(error)
+  }}
+  />
+  </View>
     </View>
   );
 }
