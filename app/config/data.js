@@ -211,14 +211,14 @@ const data=[{
   description:'React-native-chart is a simple module for adding line charts, area charts, or bar charts to your React Native app.'
 
 },
-,{
+{
   title:'react-native-gifted-listview',
   stars:'★1443+',
   link:'https://github.com/FaridSafi/react-native-gifted-listview',
   description:'A ListView that embed some recurrent features like pull-to-refresh, infinite scrolling and more for Android and iOS React-Native apps.'
 
 },
-,{
+{
   title:'react-native-datepicker',
   stars:'★1365+',
   link:'https://github.com/xgfe/react-native-datepicker',
@@ -1026,7 +1026,7 @@ const data=[{
   description:'A component for rendering A/B tests in React Native.'
 
 },
-,{
+{
   title:'detox',
   stars:'★3566+',
   category:'Utils & Infra',

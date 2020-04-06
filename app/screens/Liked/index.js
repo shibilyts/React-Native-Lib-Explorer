@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Text,StatusBar,Image,ScrollView,TouchableOpacity,TextInput,BackHandler } from 'react-native';
+import { View, Text,StatusBar,Image,FlatList,TouchableOpacity,TextInput,BackHandler } from 'react-native';
 import styles from './styles';
 import Appstyles from '../../config/styles'
 import images from '../../config/images'
@@ -89,7 +89,7 @@ setTimeout(()=> {
     this.setState({currentlyOpenSwipeable: null})
 }
 
-  renderItem=(item,index)=>{
+  renderItem=({item,index})=>{
     const {darkMode} = this.props;
     const reducerState= this.props.fav
     const isPresent=reducerState.findIndex(Item=>Item===item.newIndex);
@@ -182,18 +182,7 @@ render(){
         {/* <View style={{height:50,width:'100%'}}>
           <TextInput style={{flex:1,padding:10}}/>
           </View> */}
-          <ScrollView
-          contentContainerStyle={{paddingBottom:20}}
-          >
-          {newDate.map((Item,index)=>{
-            return this.renderItem(Item,index)
-          })}
-          {newDate.length===0&&
-            <View style={{width:metrics.screenWidth,height:metrics.screenHeight*.8,justifyContent:'center',alignItems:'center'}}>
-            <Text style={{color:darkMode?Appstyles.color.COLOR_WHITE:Appstyles.color.COLOR_SECONDARY,fontWeight:'bold'}}>You don't have any favorite item</Text>
-            </View>}
-          </ScrollView>
-        {/* <FlatList
+        <FlatList
       renderItem={this.renderItem}
       data={newDate}
       extraData={this.state}
@@ -201,10 +190,12 @@ render(){
       contentContainerStyle={{paddingBottom:20}}
       ListEmptyComponent={()=>{
         return(
-         
+          <View style={{width:metrics.screenWidth,height:metrics.screenHeight*.8,justifyContent:'center',alignItems:'center'}}>
+            <Text style={{color:darkMode?Appstyles.color.COLOR_WHITE:Appstyles.color.COLOR_SECONDARY,fontWeight:'bold'}}>You don't have any favorite item</Text>
+            </View>
         )
       }}
-      /> */}
+      />
       <View style={{width:'100%',
       justifyContent:'center',alignItems:'center'}}>
         <AdMobBanner

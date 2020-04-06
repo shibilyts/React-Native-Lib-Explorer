@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Text,StatusBar,Image,ScrollView,TouchableOpacity,TextInput,BackHandler,ToastAndroid,Button } from 'react-native';
+import { View, Text,StatusBar,Image,FlatList,TouchableOpacity,TextInput,BackHandler,ToastAndroid,Button } from 'react-native';
 import styles from './styles';
 import Appstyles from '../../config/styles'
 import images from '../../config/images'
@@ -95,7 +95,7 @@ setTimeout(()=> {
     this.setState({currentlyOpenSwipeable: null})
 }
 
-  renderItem=(item,index)=>{
+  renderItem=({item,index})=>{
     const { darkMode } = this.props;
     const reducerState= this.props.fav
     const isPresent=reducerState.findIndex(item=>item===index);
@@ -110,8 +110,7 @@ setTimeout(()=> {
         </View>
         </TouchableOpacity>,
       <TouchableOpacity style={{backgroundColor:darkMode?'#354145':'#2988ae',justifyContent:'center',width:'50%',minHeight:'100%'}}
-      onPress={()=>{this.onLikePress(index);
-      this.onOpen();}}
+      onPress={()=>this.onLikePress(index)}
         activeOpacity={0.8}>
         <View style={{alignItems:'center',width:'50%'}}>{
           isPresent>-1?<Image source={images.icons.heartSelected} style={{width:25,height:25,resizeMode:'contain',tintColor:Appstyles.color.COLOR_WHITE}}/>:
@@ -207,13 +206,13 @@ render(){
         {/* <View style={{height:50,width:'100%'}}>
           <TextInput style={{flex:1,padding:10}}/>
           </View> */}
-          <ScrollView>
-          {
-            data.map((item,index)=>{
-              return this.renderItem(item,index)
-            })
-          }
-          </ScrollView>
+          <FlatList
+          renderItem={this.renderItem}
+          data={data}
+          extraData={this.state}
+          contentContainerStyle={{paddingBottom:20}}
+          keyExtractor={(item, index) => index.toString()}
+          />
     </View>
   );
 }
