@@ -5,7 +5,15 @@ import createReducer from 'app/lib/createReducer';
 import * as types from 'app/actions/types';
 
 const initialState = {
- fav:[],
+ fav:{
+  ui:[],
+  nav:[],
+  deep:[],
+  text:[],
+  form:[],
+  util:[],
+  analytics:[]
+ },
  darkMode:false,
  skipAppIntro:false
 };

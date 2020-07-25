@@ -3,12 +3,12 @@ import Appstyles from '../../config/styles'
 import metrics from '../../config/metrics'
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
   backgroundColor:"#e4e3e2",
+  flex:1
   },
   containerDark:{
-    flex: 1,
     backgroundColor:Appstyles.color.COLOR_BLACK,
+    flex:1
   },
   headerView:{backgroundColor:Appstyles.color.COLOR_PRIMARY ,
     width:metrics.screenWidth,height:37,justifyContent:'center',alignItems:'center'},
