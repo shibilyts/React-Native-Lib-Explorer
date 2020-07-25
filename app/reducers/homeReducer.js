@@ -12,7 +12,12 @@ const initialState = {
   text:[],
   form:[],
   util:[],
-  analytics:[]
+  analytics:[],
+  geo:[],
+  inter:[],
+  build:[],
+  styling:[],
+  system:[]
  },
  darkMode:false,
  skipAppIntro:false

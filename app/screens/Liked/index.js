@@ -21,6 +21,11 @@ import {
   dataForms,
   dataText,
   dataUtil,
+  dataGeo,
+  dataInter,
+  dataBuild,
+  dataStyling,
+  dataSystem
 } from '../../config/data';
 import { connect } from 'react-redux';
 import Share from 'react-native-share';
@@ -40,6 +45,11 @@ const categoryData = [
   { label: 'Analytics', type: 'analytics' },
   { label: 'Utils & Infra', type: 'util' },
   { label: 'Forms', type: 'form' },
+  {label:'Geolocation',type:'geo'},
+  {label:'Internationalization',type:'inter'},
+  {label:'Build & Development',type:'build'},
+  {label:'Styling',type:'styling'},
+  { label: 'System', type: 'system' },
 ];
 class Liked extends Component {
   constructor(props) {
@@ -282,6 +292,16 @@ class Liked extends Component {
         return dataUtil;
       case 6:
         return dataForms;
+      case 7:
+        return dataGeo;
+      case 8:
+        return dataInter;
+      case 9:
+        return dataBuild;
+      case 10:
+        return dataStyling;
+      case 11:
+        return dataSystem;
     }
   };
   calculateTotalFav = () => {
@@ -293,7 +313,12 @@ class Liked extends Component {
       fav['text'].length +
       fav['form'].length +
       fav['util'].length +
-      fav['analytics'].length;
+      fav['analytics'].length+
+      fav['geo'].length+
+      fav['inter'].length+
+      fav['build'].length+
+      fav['styling'].length+
+      fav['system'].length;
     return length;
   };
   renderCategory = ({ item, index }) => {

@@ -6,12 +6,9 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
-  TextInput,
   BackHandler,
   ToastAndroid,
-  Button,
 } from 'react-native';
-import Interactable from 'react-native-interactable';
 import styles from './styles';
 import Appstyles from '../../config/styles';
 import images from '../../config/images';
@@ -24,6 +21,11 @@ import {
   dataForms,
   dataText,
   dataUtil,
+  dataGeo,
+  dataInter,
+  dataBuild,
+  dataStyling,
+  dataSystem
 } from '../../config/data';
 import { connect } from 'react-redux';
 import Share from 'react-native-share';
@@ -34,13 +36,18 @@ import {
 } from '../../actions/homeActions.js';
 import { AdMobBanner } from 'react-native-admob';
 const categoryData = [
-  {label:'UI',type:"ui"},
-  {label:'Navigation',type:"nav"},
-  {label:'Deep Linking',type:"deep"},
-  {label:'Text & Rich Content',type:"text"},
-  {label:'Analytics',type:"analytics"},
-  {label:'Utils & Infra',type:"util"},
-  {label:'Forms',type:"form"},
+  { label: 'UI', type: 'ui' },
+  { label: 'Navigation', type: 'nav' },
+  { label: 'Deep Linking', type: 'deep' },
+  { label: 'Text & Rich Content', type: 'text' },
+  { label: 'Analytics', type: 'analytics' },
+  { label: 'Utils & Infra', type: 'util' },
+  { label: 'Forms', type: 'form' },
+  { label: 'Geolocation', type: 'geo' },
+  { label: 'Internationalization', type: 'inter' },
+  { label: 'Build & Development', type: 'build' },
+  { label: 'Styling', type: 'styling' },
+  { label: 'System', type: 'system' },
 ];
 class Home extends Component {
   constructor(props) {
@@ -52,7 +59,7 @@ class Home extends Component {
       backPressed: 0,
       currentlyOpenSwipeable: null,
       selectedCategory: 0,
-      listData:dataUI,
+      listData: dataUI,
     };
   }
 
@@ -90,13 +97,15 @@ class Home extends Component {
       });
     }, 3500);
   };
-  onLikePress = (index,selectedType) => {
+  onLikePress = (index, selectedType) => {
     const { addFavToReducer } = this.props;
     const reducerState = this.props.fav;
     this.setState({
       toggle: !this.state.toggle,
     });
-    const isAvailable = reducerState[selectedType].findIndex(item => item === index);
+    const isAvailable = reducerState[selectedType].findIndex(
+      item => item === index,
+    );
 
     if (isAvailable > -1) {
       reducerState[selectedType].splice(isAvailable, 1);
@@ -134,8 +143,10 @@ class Home extends Component {
   renderItem = ({ item, index }) => {
     const { darkMode } = this.props;
     const reducerState = this.props.fav;
-    const selectedType= categoryData[this.state.selectedCategory].type
-    const isPresent = reducerState[selectedType].findIndex(item => item === index);
+    const selectedType = categoryData[this.state.selectedCategory].type;
+    const isPresent = reducerState[selectedType].findIndex(
+      item => item === index,
+    );
     const rightButtons = [
       <TouchableOpacity
         style={{
@@ -166,7 +177,7 @@ class Home extends Component {
           width: '50%',
           minHeight: '100%',
         }}
-        onPress={() => this.onLikePress(index,selectedType)}
+        onPress={() => this.onLikePress(index, selectedType)}
         activeOpacity={0.8}>
         <View style={{ alignItems: 'center', width: '50%' }}>
           {isPresent > -1 ? (
@@ -228,8 +239,7 @@ class Home extends Component {
           }}
           onRightButtonsActivate={this.onOpen}
           onRightButtonsCloseRelease={this.onClose}
-          rightButtonsActivationDistance={20}
-          >
+          rightButtonsActivationDistance={20}>
           <TouchableOpacity
             style={{ width: '100%', minHeight: 70 }}
             onPress={() => this.navToWebView(item)}
@@ -247,6 +257,7 @@ class Home extends Component {
                   fontSize: 16,
                   fontWeight: 'bold',
                   marginLeft: 10,
+                  width: '70%',
                 }}>
                 {item.title}
               </Text>
@@ -254,6 +265,8 @@ class Home extends Component {
                 style={{
                   marginRight: 10,
                   color: Appstyles.color.COLOR_PRIMARY,
+                  alignSelf:"flex-start",
+                  marginTop:2
                 }}>
                 {item.stars}
               </Text>
@@ -289,52 +302,85 @@ class Home extends Component {
     return (
       <TouchableOpacity
         style={{
-          justifyContent:'center',
+          justifyContent: 'center',
           borderBottomWidth: selectedCategory === index ? 2 : 0,
           borderBottomColor:
-            selectedCategory === index&&darkMode
-              ? "white":selectedCategory === index&&!darkMode
+            selectedCategory === index && darkMode
+              ? 'white'
+              : selectedCategory === index && !darkMode
               ? Appstyles.color.COLOR_PRIMARY
               : 'white',
         }}
         onPress={() => this.setCategory(index)}>
-        <Text style={{alignSelf:'center',marginHorizontal:20,
-        fontWeight:'bold',
-        marginVertical:15,color:darkMode?'white':Appstyles.color.COLOR_PRIMARY}}>{item.label}</Text>
+        <Text
+          style={{
+            alignSelf: 'center',
+            marginHorizontal: 20,
+            fontWeight: 'bold',
+            marginVertical: 15,
+            color: darkMode ? 'white' : Appstyles.color.COLOR_PRIMARY,
+          }}>
+          {item.label}
+        </Text>
       </TouchableOpacity>
     );
   };
   setCategory = index => {
     const { currentlyOpenSwipeable } = this.state;
-    this.setState({ selectedCategory: index,listData:this.returnCategoryData(index) });
-    this.categoryList.scrollToIndex({index,animated:true,});
-    if(currentlyOpenSwipeable){
-    currentlyOpenSwipeable.recenter();
+    this.setState({
+      selectedCategory: index,
+      listData: this.returnCategoryData(index),
+    });
+    this.categoryList.scrollToIndex({ index, animated: true });
+    if (currentlyOpenSwipeable) {
+      currentlyOpenSwipeable.recenter();
     }
-
   };
-  returnCategoryData=(index)=>{
-switch (index){
-  case 0: return dataUI;
-  case 1: return dataNav;
-  case 2 :return dataDeep;
-  case 3: return dataText;
-  case 4: return dataAnalytics;
-  case 5: return dataUtil;
-  case 6: return dataForms;
-}
-  }
-  calculateTotalFav=()=>{
+  returnCategoryData = index => {
+    switch (index) {
+      case 0:
+        return dataUI;
+      case 1:
+        return dataNav;
+      case 2:
+        return dataDeep;
+      case 3:
+        return dataText;
+      case 4:
+        return dataAnalytics;
+      case 5:
+        return dataUtil;
+      case 6:
+        return dataForms;
+      case 7:
+        return dataGeo;
+      case 8:
+        return dataInter;
+      case 9:
+        return dataBuild;
+      case 10:
+        return dataStyling;
+      case 11:
+        return dataSystem;
+    }
+  };
+  calculateTotalFav = () => {
     const { fav } = this.props;
-const length  = fav['ui'].length+
-                fav['nav'].length+
-                fav['deep'].length+
-                fav['text'].length+
-                fav['form'].length+
-                fav['util'].length+
-                fav['analytics'].length
-                return length;
-  }
+    const length =
+      fav['ui'].length +
+      fav['nav'].length +
+      fav['deep'].length +
+      fav['text'].length +
+      fav['form'].length +
+      fav['util'].length +
+      fav['analytics'].length +
+      fav['geo'].length +
+      fav['inter'].length +
+      fav['build'].length +
+      fav['styling'].length+
+      fav['system'].length;
+    return length;
+  };
   render() {
     const { darkMode } = this.props;
     const totalFavItems = this.calculateTotalFav();
@@ -434,13 +480,13 @@ const length  = fav['ui'].length+
         <FlatList
           renderItem={this.renderCategory}
           data={categoryData}
-          ref={ref=>this.categoryList=ref}
+          ref={ref => (this.categoryList = ref)}
           horizontal
           extraData={this.state}
           contentContainerStyle={{
-            backgroundColor: darkMode?'#354145':"#ffffff",
+            backgroundColor: darkMode ? '#354145' : '#ffffff',
           }}
-          style={{flexGrow:0,flexShrink:0}}
+          style={{ flexGrow: 0, flexShrink: 0 }}
           keyExtractor={(item, index) => index.toString()}
           showsHorizontalScrollIndicator={false}
         />
@@ -449,9 +495,9 @@ const length  = fav['ui'].length+
           data={this.state.listData}
           extraData={this.state}
           keyExtractor={(item, index) => index.toString()}
-          style={{flexGrow:0}}
+          style={{ flexGrow: 0 }}
           contentContainerStyle={{
-            paddingBottom:20,
+            paddingBottom: 20,
           }}
         />
       </View>
