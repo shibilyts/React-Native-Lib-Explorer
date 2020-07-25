@@ -226,7 +226,7 @@ class Home extends Component {
             minHeight: 70,
             backgroundColor: darkMode ? Appstyles.color.COLOR_BLACK : '#e4e3e2',
           }}
-          onRightButtonsOpenRelease={this.onOpen}
+          onRightButtonsActivate={this.onOpen}
           onRightButtonsCloseRelease={this.onClose}
           rightButtonsActivationDistance={20}
           >
